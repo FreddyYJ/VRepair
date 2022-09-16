@@ -74,7 +74,10 @@ def get_token_pair_diff(pre_version_file,pre_version_file_str,
                     if t != "-//<S2SV>":
                         src_line += t[1:] + ' '
                     elif bugtag:
+                        # if src_line.startswith(('if','for','while')):
                         src += "<S2SV_StartBug> "+src_line+"<S2SV_EndBug> "
+                        # else:
+                        #     src += "<S2SV_StartBug> <S2SV_EndBug> "+src_line
                         bugtag = False
                         src_line = ""
                         continue
@@ -150,6 +153,7 @@ def main(argv):
             num_tokens=0
     else:
         metadata_file = None
+        meta=False
     if num_tokens < 2:
         print("Usage: python gensrctgt.py BugFixTokenDir num_tokens [-meta] [metadata]")
         print("       num_tokens must be 2 or more")
@@ -193,7 +197,9 @@ def main(argv):
     files = list(zip(pre_version_files, post_version_files))
     files.sort(key=lambda files: str(files[0]))
 
+    _index=0
     for pre_version_file, post_version_file in files:
+        _index+=1
         print(pre_version_file, flush=True)
         pre_version_file_str = open(pre_version_file).read()
         post_version_file_str = open(post_version_file).read()
@@ -211,7 +217,7 @@ def main(argv):
                 print(f'No CWE data found for {str(pre_version_file)}')
                 sys.exit(2)
         else:
-            src_lines += src+'\n'
+            src_lines += '%2d '%_index+src+'\n'
         tgt_lines += tgt+'\n'
     
     src_path = root_path.parent / 'SrcTgt' / (root_path.stem + '.src.txt')
